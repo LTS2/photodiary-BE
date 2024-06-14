@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -69,5 +70,12 @@ public class UserController {
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
+	}
+
+	@GetMapping("/{userId}")
+	public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+		Optional<User> userOptional = userService.findById(userId);
+		return userOptional.map(user -> ResponseEntity.ok().body(user))
+				.orElse(ResponseEntity.notFound().build());
 	}
 }

@@ -1,6 +1,5 @@
 package com.universal.springbackend.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,15 +13,17 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 쪽지 내용
     @Column(nullable = false)
     private String content;
 
-    // 보낸 사람
-    private String user;
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private User sender;
 
-    // 보낸 시간
+    @ManyToOne
+    @JoinColumn(name = "recipient_id")
+    private User recipient;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date sendAt;
 }
-
