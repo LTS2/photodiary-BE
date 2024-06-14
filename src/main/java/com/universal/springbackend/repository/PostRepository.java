@@ -1,14 +1,12 @@
 package com.universal.springbackend.repository;
 
 import com.universal.springbackend.entity.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PostRepository {
-    Post save(Post post);
-    List<Post> findAll();
-    Optional<Post> findById(Long id);
+public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByTitleContaining(String title);
 }
