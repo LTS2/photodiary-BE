@@ -10,22 +10,26 @@ import java.util.List;
 @Service
 public class PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+	@Autowired
+	private PostRepository postRepository;
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
-    }
+	public List<Post> getAllPosts() {
+		return postRepository.findAll();
+	}
 
-    public Post save(Post post) {
-        return postRepository.save(post);
-    }
+	public Post save(Post post) {
+		return postRepository.save(post);
+	}
 
-    public Post getPostById(Long id) {
-        return postRepository.findById(id).orElse(null);
-    }
+	public Post getPostById(Long id) {
+		return postRepository.findById(id).orElse(null);
+	}
 
-    public List<Post> searchByCaption(String caption) {
-        return postRepository.findByCaptionContaining(caption);
-    }
+	public List<Post> searchByCaption(String caption) {
+		return postRepository.findByCaptionContaining(caption);
+	}
+
+	public void delete(Long id) {
+		postRepository.deleteById(id);
+	}
 }

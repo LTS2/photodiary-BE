@@ -25,23 +25,27 @@ public class PostController {
     @Autowired
     private PostService postService;
 
-    // 전체 게시물 조회
     @GetMapping("/")
     public ResponseEntity<List<PostDTO>> getAllPosts() {
         log.info("getAllPosts().executed");
         List<Post> postList = postService.getAllPosts();
-        if (!postList.isEmpty()) {
-            List<PostDTO> postDTOList = postList.stream().map(this::convertToDTO).collect(Collectors.toList());
-            return new ResponseEntity<>(postDTOList, HttpStatus.OK);
+        List<PostDTO> postDTOList = postList.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(postDTOList);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
+        Post post = postService.getPostById(id);
+        if (post != null) {
+            return ResponseEntity.ok(convertToDTO(post));
         } else {
-            return ResponseEntity.status(HttpStatus.OK).build();
+            return ResponseEntity.notFound().build();
         }
     }
 
-    // 게시물 작성
     @PostMapping("/")
     public ResponseEntity<PostDTO> createPost(@RequestParam(value = "image", required = false) MultipartFile image,
-                                              @RequestParam("title") String title,  // title 파라미터 추가
+                                              @RequestParam("title") String title,
                                               @RequestParam("caption") String caption,
                                               @RequestParam("keywords") String keywords,
                                               HttpSession session) {
@@ -52,14 +56,12 @@ public class PostController {
         }
 
         try {
-
             Post post = new Post();
             post.setTitle(title);
             post.setCaption(caption);
             post.setKeywords(keywords);
             post.setAuthor(loginUser);
             post.setCreatedDate(new Date());
-
 
             if (image != null && !image.isEmpty()) {
                 log.info("Uploading image: " + image.getOriginalFilename());
@@ -80,10 +82,9 @@ public class PostController {
         }
     }
 
-
-    // 게시물 수정
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable Long id, @RequestParam(value = "image", required = false) MultipartFile image,
+                                              @RequestParam("title") String title,
                                               @RequestParam("caption") String caption,
                                               @RequestParam("keywords") String keywords,
                                               HttpSession session) {
@@ -100,15 +101,14 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        // 입력 데이터 검증
-        if (caption.isEmpty() || keywords.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (title.isEmpty() || caption.isEmpty() || keywords.isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
 
+        existingPost.setTitle(title);
         existingPost.setCaption(caption);
         existingPost.setKeywords(keywords);
 
-        // 이미지를 업데이트할 때만 변경
         if (image != null && !image.isEmpty()) {
             try {
                 byte[] imageBytes = image.getBytes();
@@ -125,35 +125,52 @@ public class PostController {
         return ResponseEntity.ok(postDTO);
     }
 
-    // 게시물 검색
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long id, HttpSession session) {
+        log.info(">>>>> PostController.deletePost.executed()");
+        User loginUser = (User) session.getAttribute("loginUser");
+        if (loginUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Post existingPost = postService.getPostById(id);
+        if (existingPost == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!existingPost.getAuthor().getId().equals(loginUser.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        try {
+            postService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Error deleting post", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<PostDTO>> searchPostsByTitle(@RequestParam String caption) {
         log.info(">>>>> PostController.searchPostsByTitle.executed()");
         List<Post> foundPosts = postService.searchByCaption(caption);
-        if (!foundPosts.isEmpty()) {
-            List<PostDTO> postDTOList = foundPosts.stream().map(this::convertToDTO).collect(Collectors.toList());
-            return ResponseEntity.ok(postDTOList);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        List<PostDTO> postDTOList = foundPosts.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(postDTOList);
     }
 
     private PostDTO convertToDTO(Post post) {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(post.getId());
-        postDTO.setTitle(post.getTitle()); // 제목 필드 추가
+        postDTO.setTitle(post.getTitle());
         postDTO.setCaption(post.getCaption());
         postDTO.setKeywords(post.getKeywords());
         postDTO.setCreatedDate(post.getCreatedDate());
 
-        // Author가 null인지 확인
         if (post.getAuthor() != null) {
             postDTO.setAuthorId(post.getAuthor().getId());
         } else {
             postDTO.setAuthorId(null);
         }
 
-        // 이미지 데이터가 null일 경우 빈 문자열을 설정
         if (post.getImage() != null) {
             postDTO.setImage(java.util.Base64.getEncoder().encodeToString(post.getImage()));
         } else {
