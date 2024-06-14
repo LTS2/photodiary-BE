@@ -74,7 +74,8 @@ public class PostController {
                         log.info("Uploading image: " + image.getOriginalFilename());
                         String originalFilename = image.getOriginalFilename();
                         String uploadDir = "src/main/resources/static/img";
-                        String uploadDir2 = "/Users/jiny/IntelliJ_workspace/photodiary-FE/public/img";
+//                        String uploadDir2 = "/Users/jiny/IntelliJ_workspace/photodiary-FE/public/img";
+                        String uploadDir2 = "/Users/ewjin/Downloads/photodiary-FE/public/img"; // 여기 절대 경로로 놓으셔야 됩니다.
                         String imagePath = uploadDir2 + "/" + originalFilename;
 
                         try {
