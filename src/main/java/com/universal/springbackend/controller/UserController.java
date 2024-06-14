@@ -21,12 +21,6 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-//	@GetMapping("/")
-//	public List<User> getAllUsers(){
-//	    log.info(">>>>> UserController.String.executed()");
-//	    return userService.findAll();
-//	}
-
 	// 회원가입
 	@PostMapping
 	public ResponseEntity<User> createUser(@RequestBody User user) {

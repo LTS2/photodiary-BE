@@ -1,27 +1,37 @@
 package com.universal.springbackend.entity;
 
+
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@RequiredArgsConstructor
-@AllArgsConstructor
+import java.util.Date;
+
+@Data
 @Entity
+@Table(name = "post")
 public class Post {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String postAuthorId;
+
+
     @Column(nullable = false)
     private String title;
-    @Column(nullable = false)
-    private String contents;
-    private String fileName;
-    private String filePath;
+
+    @Column(nullable = true)
+    private String caption;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
+
+    @Lob
+    @Column(nullable = true)
+    private byte[] image;
+
+    @Column(nullable = true)
+    private String keywords;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
 }
