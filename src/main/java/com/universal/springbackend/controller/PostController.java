@@ -140,9 +140,9 @@ public class PostController {
 
     // 게시물 검색
     @GetMapping("/search")
-    public ResponseEntity<List<PostDTO>> searchPostsByTitle(@RequestParam String caption) {
+    public ResponseEntity<List<PostDTO>> searchPostsByTitle(@RequestParam String keywords) {
         log.info(">>>>> PostController.searchPostsByTitle.executed()");
-        List<Post> foundPosts = postService.searchByCaption(caption);
+        List<Post> foundPosts = postService.searchByCaption(keywords);
         if (!foundPosts.isEmpty()) {
             List<PostDTO> postDTOList = foundPosts.stream().map(this::convertToDTO).collect(Collectors.toList());
             return ResponseEntity.ok(postDTOList);
@@ -175,4 +175,7 @@ public class PostController {
 
         return postDTO;
     }
+
+    // 검색 기능
+
 }

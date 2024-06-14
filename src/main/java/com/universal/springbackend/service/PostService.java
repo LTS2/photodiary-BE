@@ -25,7 +25,8 @@ public class PostService {
         return postRepository.findById(id).orElse(null);
     }
 
-    public List<Post> searchByCaption(String caption) {
-        return postRepository.findByCaptionContaining(caption);
+    public List<Post> searchByCaption(String keywords) {
+        return postRepository.findByKeywordsContaining(keywords);
+
     }
 }
