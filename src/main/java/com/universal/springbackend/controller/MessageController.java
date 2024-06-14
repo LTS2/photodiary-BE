@@ -31,6 +31,7 @@ public class MessageController {
 	@PostMapping("/")
 	public ResponseEntity<Message> sendMessage(@RequestBody MessageDTO messageDTO, HttpSession session) {
 		User loginUser = (User) session.getAttribute("loginUser");
+		System.out.println("현재 로그인 유저 : " + loginUser);
 		if (loginUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
