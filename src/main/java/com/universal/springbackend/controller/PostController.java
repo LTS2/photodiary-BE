@@ -74,14 +74,16 @@ public class PostController {
                         log.info("Uploading image: " + image.getOriginalFilename());
                         String originalFilename = image.getOriginalFilename();
                         String uploadDir = "src/main/resources/static/img";
-                        String imagePath = uploadDir + "/" + originalFilename;
+                        String uploadDir2 = "/Users/jiny/IntelliJ_workspace/photodiary-FE/public/img";
+                        String imagePath = uploadDir2 + "/" + originalFilename;
 
                         try {
                             byte[] bytes = image.getBytes();
                             Path path = Paths.get(imagePath);
                             Files.write(path, bytes);
-                            String webPath = "/resources/static/img/" + originalFilename;
+                            String webPath = "/Users/jiny/IntelliJ_workspace/photodiary-FE/public/img/" + originalFilename;
                             post.setImage(webPath);
+                            post.setOriginal(originalFilename);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -99,6 +101,8 @@ public class PostController {
         }
     }
 
+
+    // 게시물 수정
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable Long id, @RequestParam(value = "image", required = false) MultipartFile image,
                                               @RequestParam("title") String title,
@@ -168,20 +172,25 @@ public class PostController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PostDTO>> searchPostsByTitle(@RequestParam String caption) {
+    public ResponseEntity<List<PostDTO>> searchPostsByTitle(@RequestParam String keywords) {
         log.info(">>>>> PostController.searchPostsByTitle.executed()");
-        List<Post> foundPosts = postService.searchByCaption(caption);
-        List<PostDTO> postDTOList = foundPosts.stream().map(this::convertToDTO).collect(Collectors.toList());
-        return ResponseEntity.ok(postDTOList);
+        List<Post> foundPosts = postService.searchByCaption(keywords);
+        if (!foundPosts.isEmpty()) {
+            List<PostDTO> postDTOList = foundPosts.stream().map(this::convertToDTO).collect(Collectors.toList());
+            return ResponseEntity.ok(postDTOList);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private PostDTO convertToDTO(Post post) {
         PostDTO postDTO = new PostDTO();
         postDTO.setId(post.getId());
-        postDTO.setTitle(post.getTitle());
+        postDTO.setTitle(post.getTitle()); // 제목 필드 추가
         postDTO.setCaption(post.getCaption());
         postDTO.setKeywords(post.getKeywords());
         postDTO.setCreatedDate(post.getCreatedDate());
+        postDTO.setOriginal(post.getOriginal());
 
         // Author가 null인지 확인
         if (post.getAuthor() != null) {
