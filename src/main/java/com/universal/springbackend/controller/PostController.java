@@ -12,6 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,37 +45,45 @@ public class PostController {
 
     // 게시물 작성
     @PostMapping("/")
-    public ResponseEntity<PostDTO> createPost(@RequestParam(value = "image", required = false) MultipartFile image,
-                                              @RequestParam("title") String title,  // title 파라미터 추가
-                                              @RequestParam("caption") String caption,
-                                              @RequestParam("keywords") String keywords,
-                                              HttpSession session) {
-        log.info(">>>>> PostController.createPost.executed()");
-        User loginUser = (User) session.getAttribute("loginUser");
-        if (loginUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+            public ResponseEntity<PostDTO> createPost(@RequestParam(value = "image", required = false) MultipartFile image,
+                    @RequestParam("title") String title,  // title 파라미터 추가
+                    @RequestParam("caption") String caption,
+                    @RequestParam("keywords") String keywords,
+                    HttpSession session) {
+                log.info(">>>>> PostController.createPost.executed()");
+                User loginUser = (User) session.getAttribute("loginUser");
+                if (loginUser == null) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
 
-        try {
+                try {
+                    Post post = new Post();
+                    post.setTitle(title);
+                    post.setCaption(caption);
+                    post.setKeywords(keywords);
+                    post.setAuthor(loginUser);
+                    post.setCreatedDate(new Date());
 
-            Post post = new Post();
-            post.setTitle(title);
-            post.setCaption(caption);
-            post.setKeywords(keywords);
-            post.setAuthor(loginUser);
-            post.setCreatedDate(new Date());
+                    if (image != null && !image.isEmpty()) {
+                        log.info("Uploading image: " + image.getOriginalFilename());
+                        String originalFilename = image.getOriginalFilename();
+                        String uploadDir = "src/main/resources/static/img";
+                        String imagePath = uploadDir + "/" + originalFilename;
 
+                        try {
+                            byte[] bytes = image.getBytes();
+                            Path path = Paths.get(imagePath);
+                            Files.write(path, bytes);
+                            String webPath = "/resources/static/img/" + originalFilename;
+                            post.setImage(webPath);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
-            if (image != null && !image.isEmpty()) {
-                log.info("Uploading image: " + image.getOriginalFilename());
-                byte[] imageBytes = image.getBytes();
-                log.info("Image size: " + imageBytes.length);
-                post.setImage(imageBytes);
-            } else {
-                log.info("No image uploaded");
-                post.setImage(null);
-            }
-
+                    } else {
+                        log.info("No image uploaded");
+                        post.setImage(null);
+                    }
             Post savedPost = postService.save(post);
             PostDTO postDTO = convertToDTO(savedPost);
             return new ResponseEntity<>(postDTO, HttpStatus.CREATED);
@@ -109,15 +122,15 @@ public class PostController {
         existingPost.setKeywords(keywords);
 
         // 이미지를 업데이트할 때만 변경
-        if (image != null && !image.isEmpty()) {
-            try {
-                byte[] imageBytes = image.getBytes();
-                existingPost.setImage(imageBytes);
-            } catch (Exception e) {
-                log.error("Error updating image", e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-            }
-        }
+//        if (image != null && !image.isEmpty()) {
+//            try {
+//                byte[] imageBytes = image.getBytes();
+//                existingPost.setImage(imageBytes);
+//            } catch (Exception e) {
+//                log.error("Error updating image", e);
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//            }
+//        }
 
         Post savedPost = postService.save(existingPost);
         PostDTO postDTO = convertToDTO(savedPost);
@@ -155,7 +168,7 @@ public class PostController {
 
         // 이미지 데이터가 null일 경우 빈 문자열을 설정
         if (post.getImage() != null) {
-            postDTO.setImage(java.util.Base64.getEncoder().encodeToString(post.getImage()));
+//            postDTO.setImage(java.util.Base64.getEncoder().encodeToString(post.getImage()));
         } else {
             postDTO.setImage("");
         }

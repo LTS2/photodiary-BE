@@ -26,7 +26,7 @@ public class Post {
 
     @Lob
     @Column(nullable = true)
-    private byte[] image;
+    private String image;
 
     @Column(nullable = true)
     private String keywords;
