@@ -46,7 +46,7 @@ public class UserController {
 	}
 
 	// 로그인
-	@PostMapping("/")
+	@PostMapping("/login")
 	public ResponseEntity<User> loginUser(@RequestParam String username,
 										  @RequestParam String password,
 										  HttpSession session) {
