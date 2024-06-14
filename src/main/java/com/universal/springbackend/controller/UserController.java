@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -20,12 +22,6 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-
-//	@GetMapping("/")
-//	public List<User> getAllUsers(){
-//	    log.info(">>>>> UserController.String.executed()");
-//	    return userService.findAll();
-//	}
 
 	// 회원가입
 	@PostMapping
@@ -46,13 +42,14 @@ public class UserController {
 	}
 
 	// 로그인
-	@PostMapping("/")
+	@PostMapping("/login")
 	public ResponseEntity<User> loginUser(@RequestParam String username,
-										  @RequestParam String password,
-										  HttpSession session) {
+	                                      @RequestParam String password,
+	                                      HttpSession session, Model model) {
 		User loginUser = userService.findOne(username, password);
 		if (loginUser != null) {
 			session.setAttribute("loginUser", loginUser);
+			model.addAttribute("loginUser", loginUser); // 세션 속성 설정
 			return new ResponseEntity<>(loginUser, HttpStatus.OK);
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -69,11 +66,18 @@ public class UserController {
 	// 전체 회원목록
 	@GetMapping("/")
 	public ResponseEntity<List<User>> getAllUsers() {
-		List<User> userList = userService.getAllUsers();
+		List<User> userList = userService.findAll();
 		if (!userList.isEmpty()) {
 			return new ResponseEntity<>(userList, HttpStatus.OK);
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
+	}
+
+	@GetMapping("/{userId}")
+	public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+		Optional<User> userOptional = userService.findById(userId);
+		return userOptional.map(user -> ResponseEntity.ok().body(user))
+				.orElse(ResponseEntity.notFound().build());
 	}
 }

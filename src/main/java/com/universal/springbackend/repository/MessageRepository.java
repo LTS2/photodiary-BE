@@ -1,14 +1,12 @@
 package com.universal.springbackend.repository;
 
-import com.universal.springbackend.entity.User;
+import com.universal.springbackend.entity.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-	Optional<User> findByUsername(String username);
+public interface MessageRepository extends JpaRepository<Message, Long> {
+	List<Message> findByRecipientId(Long recipientId);
 }
