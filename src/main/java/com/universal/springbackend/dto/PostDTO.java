@@ -13,6 +13,7 @@ public class PostDTO {
 	private String caption;
 	private String image;
 	private String keywords;
+	private String original;
 	private Date createdDate;
 	private Long authorId;
 }

@@ -68,14 +68,16 @@ public class PostController {
                         log.info("Uploading image: " + image.getOriginalFilename());
                         String originalFilename = image.getOriginalFilename();
                         String uploadDir = "src/main/resources/static/img";
-                        String imagePath = uploadDir + "/" + originalFilename;
+                        String uploadDir2 = "/Users/jiny/IntelliJ_workspace/photodiary-FE/public/img";
+                        String imagePath = uploadDir2 + "/" + originalFilename;
 
                         try {
                             byte[] bytes = image.getBytes();
                             Path path = Paths.get(imagePath);
                             Files.write(path, bytes);
-                            String webPath = "/resources/static/img/" + originalFilename;
+                            String webPath = "/Users/jiny/IntelliJ_workspace/photodiary-FE/public/img/" + originalFilename;
                             post.setImage(webPath);
+                            post.setOriginal(originalFilename);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -158,6 +160,7 @@ public class PostController {
         postDTO.setCaption(post.getCaption());
         postDTO.setKeywords(post.getKeywords());
         postDTO.setCreatedDate(post.getCreatedDate());
+        postDTO.setOriginal(post.getOriginal());
 
         // Author가 null인지 확인
         if (post.getAuthor() != null) {
@@ -175,7 +178,4 @@ public class PostController {
 
         return postDTO;
     }
-
-    // 검색 기능
-
 }

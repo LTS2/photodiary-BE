@@ -29,6 +29,9 @@ public class Post {
     private String image;
 
     @Column(nullable = true)
+    private String original;
+
+    @Column(nullable = true)
     private String keywords;
 
     @ManyToOne
