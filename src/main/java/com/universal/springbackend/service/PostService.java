@@ -2,7 +2,7 @@ package com.universal.springbackend.service;
 
 import com.universal.springbackend.entity.Post;
 import com.universal.springbackend.repository.PostRepository;
-트import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

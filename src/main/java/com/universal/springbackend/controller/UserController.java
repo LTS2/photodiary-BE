@@ -69,7 +69,7 @@ public class UserController {
 	// 전체 회원목록
 	@GetMapping("/")
 	public ResponseEntity<List<User>> getAllUsers() {
-		List<User> userList = userService.getAllUsers();
+		List<User> userList = userService.findAll();
 		if (!userList.isEmpty()) {
 			return new ResponseEntity<>(userList, HttpStatus.OK);
 		} else {
