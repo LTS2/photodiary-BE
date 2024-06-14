@@ -15,7 +15,11 @@ public class MessageService {
 	private MessageRepository messageRepository;
 
 	public List<Message> getMessagesByRecipientId(Long recipientId) {
-		return messageRepository.findByRecipientId(recipientId);
+		try {
+			return messageRepository.findByRecipientId(recipientId);
+		} catch (Exception e) {
+			throw new RuntimeException("메시지를 가져오는 중 오류 발생", e);
+		}
 	}
 
 	public Message save(Message message) {
@@ -29,4 +33,5 @@ public class MessageService {
 	public void delete(Long id) {
 		messageRepository.deleteById(id);
 	}
+
 }

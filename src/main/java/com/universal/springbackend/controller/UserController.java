@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,11 +44,12 @@ public class UserController {
 	// 로그인
 	@PostMapping("/login")
 	public ResponseEntity<User> loginUser(@RequestParam String username,
-										  @RequestParam String password,
-										  HttpSession session) {
+	                                      @RequestParam String password,
+	                                      HttpSession session, Model model) {
 		User loginUser = userService.findOne(username, password);
 		if (loginUser != null) {
 			session.setAttribute("loginUser", loginUser);
+			model.addAttribute("loginUser", loginUser); // 세션 속성 설정
 			return new ResponseEntity<>(loginUser, HttpStatus.OK);
 		} else {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

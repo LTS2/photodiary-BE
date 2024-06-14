@@ -28,9 +28,13 @@ public class MessageController {
 	@Autowired
 	private UserService userService;
 
+	@ModelAttribute("loginUser")
+	public User getLoginUser(HttpSession session) {
+		return (User) session.getAttribute("loginUser");
+	}
+
 	@PostMapping("/")
-	public ResponseEntity<Message> sendMessage(@RequestBody MessageDTO messageDTO, HttpSession session) {
-		User loginUser = (User) session.getAttribute("loginUser");
+	public ResponseEntity<Message> sendMessage(@RequestBody MessageDTO messageDTO, @ModelAttribute("loginUser") User loginUser) {
 		if (loginUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -53,9 +57,9 @@ public class MessageController {
 	}
 
 	@GetMapping("/received")
-	public ResponseEntity<List<Message>> getReceivedMessages(HttpSession session) {
+	public ResponseEntity<List<Message>> getReceivedMessages(@ModelAttribute("loginUser") User loginUser) {
 		log.info("getReceivedMessages 실행함");
-		User loginUser = (User) session.getAttribute("loginUser");
+
 		if (loginUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
@@ -65,8 +69,7 @@ public class MessageController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteMessage(@PathVariable Long id, HttpSession session) {
-		User loginUser = (User) session.getAttribute("loginUser");
+	public ResponseEntity<Void> deleteMessage(@PathVariable Long id, @ModelAttribute("loginUser") User loginUser) {
 		if (loginUser == null) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}

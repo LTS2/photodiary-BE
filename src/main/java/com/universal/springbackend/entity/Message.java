@@ -17,11 +17,11 @@ public class Message {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", nullable = false)
     private User sender;
 
     @ManyToOne
-    @JoinColumn(name = "recipient_id")
+    @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
     @Temporal(TemporalType.TIMESTAMP)
